@@ -10,14 +10,12 @@ router = Router()
 user_person = {}
 
 
-# 🔘 кнопка выхода
 def exit_person_kb():
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="❌ Выйти из персонажа", callback_data="exit_person")]
     ])
 
 
-# --- Нажали кнопку ---
 @router.callback_query(lambda c: c.data == "person")
 async def choose_person(callback: CallbackQuery, state: FSMContext):
     await state.clear()  # 🔥 важно
@@ -26,7 +24,6 @@ async def choose_person(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# --- Ввод имени ---
 @router.message(PersonState.waiting_for_name)
 async def set_person(message: types.Message, state: FSMContext):
     user_id = message.from_user.id
@@ -36,7 +33,6 @@ async def set_person(message: types.Message, state: FSMContext):
 
     await message.answer(f"Гримируюсь в {person_name}...💅")
 
-    # 🔥 СРАЗУ ответ от персонажа
     response = client.chat.completions.create(
         model="gpt-5-mini",
         messages=[
@@ -54,7 +50,6 @@ async def set_person(message: types.Message, state: FSMContext):
     await state.set_state(PersonState.chatting)
 
 
-# --- Общение ---
 @router.message(PersonState.chatting)
 async def chat_as_person(message: types.Message):
     user_id = message.from_user.id

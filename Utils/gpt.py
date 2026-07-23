@@ -17,22 +17,18 @@ gpt_users = set()
 user_memory = defaultdict(lambda: deque(maxlen=15))
 
 
-# --- ВКЛЮЧЕНИЕ GPT ---
 def enable_gpt(user_id):
     gpt_users.add(user_id)
 
 
-# --- ВЫКЛЮЧЕНИЕ GPT ---
 def disable_gpt(user_id):
     gpt_users.discard(user_id)
 
 
-# --- ОБРАБОТКА СООБЩЕНИЙ ---
 @router.message(StateFilter(None))
 async def chat(message: types.Message):
     user_id = message.from_user.id
 
-    # если GPT выключен — игнорируем
     if user_id not in gpt_users:
         return
 
@@ -40,7 +36,6 @@ async def chat(message: types.Message):
 
     try:
 
-        # добавляем вопрос пользователя в память
         user_memory[user_id].append(
             {
                 "role": "user",
@@ -55,7 +50,6 @@ async def chat(message: types.Message):
             }
         ]
 
-        # добавляем историю
         messages.extend(user_memory[user_id])
 
         response = client.chat.completions.create(
@@ -65,7 +59,6 @@ async def chat(message: types.Message):
 
         answer = response.choices[0].message.content
 
-        # сохраняем ответ GPT
         user_memory[user_id].append(
             {
                 "role": "assistant",

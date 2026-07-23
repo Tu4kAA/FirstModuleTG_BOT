@@ -10,7 +10,7 @@ router = Router()
 async def gpt_handler(callback: types.CallbackQuery):
     user_id = callback.from_user.id
 
-    enable_gpt(user_id)  # 🔥 включаем GPT режим
+    enable_gpt(user_id)
 
     await callback.message.answer("/gpt")
     await callback.message.answer_photo(
